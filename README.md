@@ -1,6 +1,6 @@
 # Hidden Room
 
-Web-based Annonymous Live Chat App.
+Web-based Anonymous Live Chat App.
 
 ## Initial Setup
 
@@ -27,10 +27,13 @@ To create a production version of your app:
 
 ```bash
 # build sveltekit
-npm run build
+npm run build-app
 
 # build server
 npm run build-server
+
+# build both
+npm run build
 ```
 
 ## Runing the Server
@@ -38,6 +41,6 @@ npm run build-server
 To run the server
 
 ```bash
-# build 
+# run server 
 npm run run-server
 ```

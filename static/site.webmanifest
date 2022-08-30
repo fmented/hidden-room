@@ -1,6 +1,7 @@
 {
     "name": "Hidden Room",
     "short_name": "Hidden Room",
+    "description": "Live Anonymous Chat App",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
