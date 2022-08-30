@@ -70,9 +70,7 @@ import { browser } from "$app/environment";
             ){
             messages = [...messages];
             counter += 1
-            lastTime = time
-            console.log(counter);
-            
+            lastTime = time            
         }
         anim = requestAnimationFrame(loop)
     }
