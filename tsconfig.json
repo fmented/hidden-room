@@ -10,6 +10,7 @@
 		"sourceMap": true,
 		"strict": true,
 		"baseUrl": ".",
+		"importsNotUsedAsValues" : "remove",
 		"paths": {
 			"$server":["server"],
 			"$server/*":["server/*"],
