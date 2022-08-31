@@ -27,10 +27,10 @@ To create a production version of your app:
 
 ```bash
 # build sveltekit
-npm run build-app
+npm run build:app
 
 # build server
-npm run build-server
+npm run build:server
 
 # build both
 npm run build
@@ -42,5 +42,5 @@ To run the server
 
 ```bash
 # run server 
-npm run run-server
+npm run serve
 ```

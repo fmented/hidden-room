@@ -9,6 +9,8 @@
     --fg1: white;
     --fg2: #ddd;
 
+    --sf: 3;
+
     --pat: radial-gradient(circle at center center, var(--bg1), var(--ac1)), repeating-radial-gradient(circle at center center, var(--bg1), var(--bg1), 40px, transparent 80px, transparent 40px);
 }
 
@@ -45,6 +47,7 @@ section{
     opacity: 0.9;
     background-image: var(--pat);
     background-blend-mode: multiply;   
+    background-attachment: fixed;
 }
 
 .sr{
@@ -59,3 +62,47 @@ section{
     white-space: nowrap !important;
     
 }
+
+
+.bounce{
+    animation-name: bounce;
+    animation-duration: 2s;
+    animation-fill-mode: both;
+    animation-delay: 5s;
+    animation-timing-function: ease-out;
+}  
+
+
+@media screen and (min-width: 400px) {
+    :root{
+        --sf: 2;
+    }
+}
+
+@media screen and (min-width: 600px) {
+    :root {	
+      --sf: 1 
+    
+    } 
+}
+
+
+@keyframes bounce {	
+    0% {
+        transform: none
+    }
+    
+    20% {
+        transform: translateY(calc(var(--sf) * 1.2rem));
+    }
+
+    80%{
+        transform: translateY(calc(var(--sf) * 1.2rem));
+    }
+
+    100% {
+        transform: none;
+    }
+
+} 
+

@@ -5,12 +5,19 @@
 
     const d = createEventDispatcher()
 
-    let alias:string
-    let key:string
+    let alias:string='anonymous'
+    let key:string=''
+
+    let processing = false;
     
     let wrongKey=false;
+    let noAlias=false;
 
     function check_key() {
+        if(processing) return
+        processing = true
+        if(alias.length < 4) 
+        noAlias = true 
         fetch(`/api/check_key`, {
             headers:{
                 key,
@@ -18,17 +25,21 @@
             },
             method:'POST'
         }).then(r=>r.json()).then(res=>{
-            if(res.match===false){
+            if(res.match===false ){
                 wrongKey=true
             }
             else{
-                d('join', key)
+                if(noAlias) return
                 $userId = res.id;
                 $userAlias = alias;
+                d('join', key)
             }
+            
+            processing = false
         })
     }
 
+    let keyField:HTMLTextAreaElement
 </script>
 
 <style>
@@ -60,12 +71,16 @@
         flex-direction: column;
     }
 
-    input{
+    input, textarea{
         margin-top: .5rem;
         background-color: var(--bg2);
         border-radius: .5em;
         padding: .5rem;
         color: var(--fg1);
+    }
+
+    textarea{
+        resize: none;
     }
 
     .field:first-of-type{
@@ -91,12 +106,27 @@
     <div class="con">
         <div class="field">
             <label for="alias">Alias : </label>
-            <input type="text" id="alias" bind:value="{alias}">
+            <input type="text" id="alias" readonly={processing} bind:value="{alias}" on:input="{()=>{if(noAlias) noAlias=false}}"  on:keypress="{(e)=>{
+                const k = e.key.toLowerCase()
+                if( (k === 'enter' || k === 'return')) {
+                    e.preventDefault()
+                    keyField.focus()
+                }
+            }}">
+            {#if noAlias}
+                <small>Alias has to be 4 characters or more</small>
+            {/if}
         </div>
  
         <div class="field">
             <label for="key">Room Key : </label>
-            <input type="text" id="key" bind:value="{key}" on:input="{()=>{if(wrongKey) wrongKey=false}}">
+            <textarea bind:this="{keyField}" readonly={processing} id="key" rows="3" bind:value="{key}" on:input="{()=>{if(wrongKey) wrongKey=false}}" on:keypress="{(e)=>{
+                const k = e.key.toLowerCase()
+                if( (k === 'enter' || k === 'return')) {
+                    e.preventDefault()
+                    check_key()
+                }
+            }}"/>
             {#if wrongKey}
                 <small>Wrong key, Check your key again</small>
             {/if}

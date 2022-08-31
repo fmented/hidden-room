@@ -3,11 +3,14 @@
     import { createEventDispatcher } from "svelte";
     const d = createEventDispatcher()
     let inputHeight = '4em'
+    let processing= false
 
     function send(){
-        if(message==='') return
+        if(message==='' || processing) return
+        processing = true
         d('send', message.trim())
         message = ''
+        processing = false
     }
 </script>
 

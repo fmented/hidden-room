@@ -2,6 +2,11 @@
     import {room} from '$lib/store'
     let w:number
     import Logo from '$lib/components/Logo.svelte'
+    import { page } from '$app/stores';
+    
+    $: x = $page.url.pathname
+    
+    
 </script>
 
 <svelte:window bind:innerWidth="{w}"/>
@@ -36,9 +41,11 @@ header{
 }
 
 .logo>*{cursor: pointer;}
+
+
 </style>
 
-<header>
+<header class:bounce="{x=='/'}">
     <div class="logo">
         <a href="/">
             <Logo/>

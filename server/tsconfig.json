@@ -10,6 +10,12 @@
 		"baseUrl": "../.",
         "moduleResolution": "node",
         "outDir": "../dist",
-        "target": "esnext"
+        "target": "esnext",
+		"paths": {
+			"$server":["server"],
+			"$server/*":["server/*"],
+			"$lib":["src/lib"],
+			"$lib/*":["src/lib/*"]
+		}
 	}
 }

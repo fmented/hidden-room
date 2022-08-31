@@ -1,13 +1,13 @@
 <script lang="ts">
     import { page } from "$app/stores";
-    import {hostname, room} from '$lib/store'
+    import {room} from '$lib/store'
     import JoinRoomModal from "$lib/components/JoinRoomModal.svelte";
     import MessageInput from "$lib/components/MessageInput.svelte";
     import MessageList from "$lib/components/MessageList.svelte";
     import { userAlias, userId } from "$lib/store";
     import {io} from "socket.io-client";
     import type { Msg } from "$lib/types";
-import { browser } from "$app/environment";
+    import { browser } from "$app/environment";
 
     let messages:Msg[] = []
 
@@ -16,7 +16,7 @@ import { browser } from "$app/environment";
     let client:ReturnType<typeof io>| undefined = undefined
 
     function connect(key:string) {
-        if(!key || $userAlias || $userId) return
+        if(!key || !$userAlias || !$userId) return
         client = io({
             query:{
                 room:$room,
@@ -32,12 +32,27 @@ import { browser } from "$app/environment";
 
         client.on('message', (msg:Msg)=>{
             messages = [...messages, {...msg, time:new Date().getTime()}]
+            scroll()
             
         })
 
-        client.on('disconnect', ()=>{
-            window.location.href = $hostname
+        client.on('join', (msg:Msg)=>{
+            messages = [...messages, {...msg, time:new Date().getTime()}]
+            scroll()
         })
+
+        client.on('kick', ()=>{
+            client?.disconnect()
+        })
+
+        client.on('disconnect', ()=>{
+            window.location.href = '/'
+        })
+    }
+
+    function scroll() {
+        const h = document.querySelector('html')
+        h?.scroll({top:h.scrollHeight, behavior:'smooth'})
     }
 
 
@@ -50,6 +65,7 @@ import { browser } from "$app/environment";
             time: new Date().getTime()
         }
         messages = [...messages, m]
+        scroll()
         client.emit('message', m)
     }
 

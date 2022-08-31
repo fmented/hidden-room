@@ -34,17 +34,32 @@
 		height: 100vh;
 		display: grid;
 		place-items: center;
-		background-color: #555;
-		background-color: #2af;
-		opacity: 0.9;
-		background-image: radial-gradient(circle at center center, #222, #2af), repeating-radial-gradient(circle at center center, #222, #222, 40px, transparent 80px, transparent 40px);
-		background-blend-mode: multiply;   
-		background-attachment: fixed;
+		position: absolute;
+		top: 0;
 	}
 
 	div{
 		display: flex;
 		gap: 2rem
 	}
-		
+
+	:global(body){
+		position: relative;
+	}
+
+	:global(body::before){
+		content: "reminder : this web app requires javascript to work properly";
+		top: 0;
+		position: absolute;
+		text-align: center;
+		left: 50%;
+		transform: translateX(-50%);
+		overflow: hidden;
+		color: white;
+		font-weight: bold;
+		z-index: 1;
+		font-family: Arial, Helvetica, sans-serif;
+
+	}	
+	
 </style>

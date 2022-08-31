@@ -16,15 +16,19 @@ section{
     width: 100%;
     overflow: hidden;
     margin: 5.5rem 0 5rem 0;
-    min-height: 100vh;
+    min-height: calc(100vh - 11.5rem);
+    padding-bottom: 1rem;
+    height: auto;
 }
 
 </style>
 
 <section>
-    {#each messages as message}
-        {#key `${message.from}${message.message}${calcTime(message.time)}`}
-            <Message message={message.message} _from={message.alias} sender={message.from===id} time={message.time}/>
-        {/key}
+    {#each messages as message (`${message.from}${message.message}${calcTime(message.time)}`)}
+        <Message 
+            message={message.message} 
+            _from={message.alias} 
+            sender={message.from===id} 
+            time={message.time}/>
     {/each}
 </section>

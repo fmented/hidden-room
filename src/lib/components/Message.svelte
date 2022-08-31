@@ -26,6 +26,7 @@
     align-self: flex-start;
     color: var(--fg1);
     min-height: max-content;
+    flex-shrink: 0;
 }
 
 .accent{
@@ -57,6 +58,7 @@ p{
 em{
     align-self: flex-end;
 }
+
 
 </style>
 

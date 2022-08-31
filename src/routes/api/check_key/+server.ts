@@ -11,6 +11,7 @@ import { v4 as id } from 'uuid';
         d = decrypt(key as string);
         match = room===d 
     } catch (error) {
+        if((error as {library:string}).library !== "Provider routines") console.log(error);
         
     }
 
