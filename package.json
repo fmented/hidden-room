@@ -1,19 +1,16 @@
 {
 	"name": "hidden-room",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"scripts": {
 		"dev": "vite dev",
 		"gen": "node scripts/gen-key.cjs",
 		"preview": "vite preview",
 		"sync": "svelte-kit sync",
-
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		
 		"build:app": "vite build",
 		"build:server": "cd server && npx --yes tsc && cd .. && npx --yes copyfiles \"build/client/**/**\" dist",
 		"build": "npm run build:app && npm run build:server",
-
 		"serve": "node dist/server/server.js"
 	},
 	"devDependencies": {
