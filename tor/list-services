@@ -1,0 +1,10 @@
+#!/bin/bash
+
+services=($(cat /etc/tor/torrc | grep "^HiddenServiceDir" | awk '{print $2}'))
+echo
+for s in ${services[@]}
+do
+  echo  service : $s
+  echo  address : $(cat $services/hostname)
+  echo
+done

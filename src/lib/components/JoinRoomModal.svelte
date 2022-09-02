@@ -106,7 +106,16 @@
     <div class="con">
         <div class="field">
             <label for="alias">Alias : </label>
-            <input type="text" id="alias" readonly={processing} bind:value="{alias}" on:input="{()=>{if(noAlias) noAlias=false}}"  on:keypress="{(e)=>{
+            <input type="text" id="alias" readonly={processing} bind:value="{alias}" 
+            on:input="{()=>{
+                    if(noAlias) noAlias=false
+            }}"
+
+            on:click="{()=>{
+                if(processing) processing = false
+            }}"
+             
+            on:keypress="{(e)=>{
                 const k = e.key.toLowerCase()
                 if( (k === 'enter' || k === 'return')) {
                     e.preventDefault()

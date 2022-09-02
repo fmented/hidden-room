@@ -112,6 +112,12 @@
     <title>{title}</title>
 </svelte:head>
 
+
+<style>
+    :global(body::before){
+        content: '' !important;
+    }
+</style>
 {#if !auth}
     <section>
         <JoinRoomModal on:join={e=>connect(e.detail)}/>
