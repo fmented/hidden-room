@@ -258,6 +258,112 @@ networks:
   tor-bridge:
 `
 
+const composeCustom = `
+services:
+  tor:
+    build:
+      context: ./tor
+      dockerfile: Dockerfile.custom
+    container_name: tor
+    networks:
+       - tor-bridge
+
+  hidden_room:
+    build: .
+    container_name: web
+    network_mode: service:tor
+
+networks:
+  tor-bridge:
+`
+
+
+const torCustomFilter = function(filter){
+    return `
+FROM ubuntu
+
+WORKDIR /addr
+
+RUN apt update
+RUN apt install git make gcc libsodium-dev autoconf -y
+RUN git clone https://github.com/cathugger/mkp224o.git
+
+WORKDIR /addr/mkp224o
+
+RUN ./autogen.sh && ./configure && make
+RUN ./mkp224o ${filter == "" ?'xroom' : filter} -t 2 -v -n 1 -d ../res
+
+WORKDIR /addr/res/
+
+RUN mv xroom* hidden_room
+RUN mkdir hidden_room/authorized_clients
+
+
+FROM alpine
+
+RUN apk update
+RUN apk add tor shadow bash
+
+COPY torrc /etc/tor/torrc
+COPY start-services /bin/start-services
+COPY list-services /bin/list-services
+COPY stop-services /bin/stop-services
+
+RUN chmod +x /bin/start-services
+RUN chmod +x /bin/list-services
+RUN chmod +x /bin/stop-services
+
+COPY /addr/res/hidden_room /var/lib/tor/hidden_room
+RUN chown -R tor /var/lib/tor/hidden_room
+RUN chmod -R u+rwX,og-rwx /var/lib/tor/hidden_room
+
+# Change Tor user to a high UID that's unlikely to conflict with anything on the host
+RUN usermod -u 7942 -o tor
+
+# Remove the shadow package (we only needed it for the usermod command)
+RUN apk del shadow
+
+# Runtime settings
+USER tor
+ENV HOME /var/lib/tor
+WORKDIR /var/lib/tor
+CMD ["/usr/bin/tor", "-f", "/etc/tor/torrc", "--runasdaemon" ,"0"]
+    `
+}
+
+const torCustomDir = `
+FROM alpine
+
+RUN apk update
+RUN apk add tor shadow bash
+
+COPY torrc /etc/tor/torrc
+COPY start-services /bin/start-services
+COPY list-services /bin/list-services
+COPY stop-services /bin/stop-services
+
+RUN chmod +x /bin/start-services
+RUN chmod +x /bin/list-services
+RUN chmod +x /bin/stop-services
+
+COPY service /var/lib/tor/hidden_room
+RUN chown -R tor /var/lib/tor/hidden_room
+RUN chmod -R u+rwX,og-rwx /var/lib/tor/hidden_room
+
+# Change Tor user to a high UID that's unlikely to conflict with anything on the host
+RUN usermod -u 7942 -o tor
+
+# Remove the shadow package (we only needed it for the usermod command)
+RUN apk del shadow
+
+# Runtime settings
+USER tor
+ENV HOME /var/lib/tor
+WORKDIR /var/lib/tor
+CMD ["/usr/bin/tor", "-f", "/etc/tor/torrc", "--runasdaemon" ,"0"]
+`
+
+
 fs.writeFile('Dockerfile', 
     web, 
     (err)=> {
@@ -270,7 +376,7 @@ fs.writeFile('tor/torrc',
     torrc, 
     (err)=> {
         if (err) return console.log(err);
-        console.log('generating torrc');
+        console.log('generating tor/torrc');
 });
 
 
@@ -294,3 +400,38 @@ fs.writeFile('docker-compose.yaml',
         if (err) return console.log(err);
         console.log('generating docker-compose.yaml');
 });
+
+
+
+const customPath = 'tor/service'
+
+const useCustom = fs.existsSync(customPath)
+if(useCustom){
+    const isDir = fs.lstatSync(customPath).isDirectory()
+
+    if(!isDir){
+        const prefix = fs.readFileSync(customPath);
+        fs.writeFile('tor/Dockerfile.custom', 
+            torCustomFilter(prefix), 
+            (err)=> {
+                if (err) return console.log(err);
+                console.log('generating tor/Dockerfile.custom');
+        });
+    }
+
+    else{
+        fs.writeFile('tor/Dockerfile.custom', 
+            torCustomDir, 
+            (err)=> {
+                if (err) return console.log(err);
+                console.log('generating tor/Dockerfile.custom');
+        });
+    }
+
+    fs.writeFile('docker-compose.custom.yaml', 
+    composeCustom, 
+    (err)=> {
+        if (err) return console.log(err);
+        console.log('generating docker-compose.custom.yaml');
+    });
+}

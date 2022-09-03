@@ -61,7 +61,7 @@ npm run serve
 ## Container
 
 ```bash
-# generate Dokerfile and scripts
+# generate necessary files for deployment
 npm run deploy:prepare
 
 ```
@@ -95,22 +95,47 @@ chmod +x podman.sh
 
 ## Deployment
 Hidden Room was meant to be a hidden service.
-For easy deployment it includes tor image builder that is located in tor directory 📁, it will also generate <kbd>docker-compose.yaml</kbd> so it can easily be deployed using <kbd>docker-compose</kbd>
+For easy deployment it includes tor image builder that is located in tor directory 📁, it will also generate <kbd>docker-compose.yaml</kbd> so it can easily be deployed using <kbd>docker-compose</kbd> or <kbd>podman-compose</kbd>
 
 > when you run
 > ```bash
 > npm run deploy:prepare
 >```
-> it will generate <kbd>Dockerfile</kbd>, <kbd>docker.sh</kbd>, <kbd>podman.sh</kbd>,
-and <kbd>docker-compose.yaml</kbd> in the root directory. it will also generate <kbd>torrc</kbd> in tor directory. check if those files are created.
+> it will generate <kbd>Dockerfile</kbd>, <kbd>docker.sh</kbd>, <kbd>podman.sh</kbd>, <kbd>docker-compose.yaml</kbd> and <kbd>tor/torrc</kbd>. Check if those files are properly generated.
+>
+> however if you have (either file or directory) service in tor directory 
+> it will also generate <kbd>tor/Dockerfile.custom</kbd> and <kbd>docker-compose.custom.yaml</kbd>
+>
+> if <kbd>tor/service</kbd> is a directory it will copy the content inside that directory into /var/lib/tor/hidden_room inside tor image, it should contains <kbd>hostname</kbd>, <kbd>hs_ed25519_public_key</kbd>, <kbd>hs_ed25519_secret_key</kbd>.
+>
+> and if <kbd>tor/service</kbd> is a file it will try to create custom onion address based on the text inside that file (keep in mind the longer the prefix the more time is required to build tor image, 4 or less characters would be fine). if there is no text inside that file it will use "xroom" as prefix
+>
 >
 > if everything is ready, simply run
 > ```bash
+> # docker-compose
 > docker-compose up -d
+> 
+> # podman-compose
+> podman-compose up -d
 >```
 >
-> to see the onion address
+> and if you want to use your custom onion address
+>
 > ```bash
+> # docker
+> docker-compose -f docker-compose.custom.yaml up -d
+>
+> # podman
+> podman-compose -f docker-compose.custom.yaml up -d
+>```
+>
+> to see your onion address
+> ```bash
+> # docker
+> docker exec tor list-services
+>
+> # podman
 > docker exec tor list-services
 >```
 >

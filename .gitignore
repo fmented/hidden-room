@@ -10,3 +10,4 @@ node_modules
 .output
 server/key.ts
 dist
+tor/service
