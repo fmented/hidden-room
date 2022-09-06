@@ -1,6 +1,8 @@
 <script lang="ts">
-    let message = ''
+    import type {FileConstructParam} from "$lib/types" 
     import { createEventDispatcher } from "svelte";
+
+    let message = ''
     const d = createEventDispatcher()
     let inputHeight = '4em'
     let processing= false
@@ -17,10 +19,17 @@
     let fileToSend: FileList|undefined = undefined 
     let fileEl:HTMLInputElement 
 
-    function sendFile(){
+    async function sendFile(){
         if(fileToSend===undefined || processing) return
         processing = true
-        d('send', {content:fileToSend[0], type:'file'})
+        const f = fileToSend[0]
+        const p:FileConstructParam = {
+            buff: await f.arrayBuffer(),
+            name: f.name,
+            type: f.type
+        }
+
+        d('send', {content:p, type:'file'})
         fileToSend= undefined
         fileEl.value = ''
         processing = false
@@ -94,5 +103,5 @@ input[type="file"]{
         <label for="file" class="sr">File</label>
         <input type="file" bind:files="{fileToSend}" bind:this="{fileEl}" style="height: {inputHeight};">
     {/if}
-    <button on:click="{send}">send</button>
+    <button on:click="{send}">Send</button>
 </div>

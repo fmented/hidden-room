@@ -2,10 +2,15 @@ import {Server} from 'socket.io'
 import {decrypt} from './crypt.js'
 import type { Server as s } from "http";
 import type {ViteDevServer as vd} from 'vite'
-import type {Msg} from '$lib/types'
+import type {Msg, MsgTransmit} from '$lib/types'
+import { __TRANFER_LIMIT__ } from './settings.js';
 
 export default function injectSocket(server: vd['httpServer']){
-    const io = new Server(server as s, {})
+    const io = new Server(server as s, {
+        pingInterval:25_000, 
+        pingTimeout:200_000,
+        maxHttpBufferSize: __TRANFER_LIMIT__
+    })
 
     io.on('connection', (socket)=>{
         const room = socket.handshake.query.room as string
@@ -46,7 +51,7 @@ export default function injectSocket(server: vd['httpServer']){
 
         socket.broadcast.to(room).emit('join', msg)
         
-        socket.on('message', async (msg:Msg)=>{       
+        socket.on('message', async (msg:MsgTransmit)=>{       
             socket.broadcast.to(room).emit('message', msg)
 
         })

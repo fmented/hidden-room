@@ -1,4 +1,4 @@
-import {decrypt} from '$server/crypt'
+import {decrypt} from '$server/crypt.js'
 import type { RequestHandler } from '@sveltejs/kit';
 import { v4 as id } from 'uuid';
 

@@ -9,7 +9,8 @@ Web-based Anonymous Live Chat App.
 ## Initial Setup
 
 ```bash
-#install dependencies
+# install dependencies
+# this is not required if you just want to use container
 npm i
 
 # generate server/key.ts
@@ -94,12 +95,12 @@ For easy deployment it includes tor image builder that is located in tor directo
 >```
 > it will generate <kbd>Dockerfile</kbd>, <kbd>docker.sh</kbd>, <kbd>podman.sh</kbd>, <kbd>docker-compose.yaml</kbd> and <kbd>tor/torrc</kbd>. Check if those files are properly generated.
 >
-> however if you have (either file or directory) service in tor directory 
+> however if you have either file or directory named <kbd>service</kbd> in tor directory 
 > it will also generate <kbd>tor/Dockerfile.custom</kbd> and <kbd>docker-compose.custom.yaml</kbd>
 >
-> if <kbd>tor/service</kbd> is a directory it will copy the content inside that directory into /var/lib/tor/hidden_room inside tor image, it should contains <kbd>hostname</kbd>, <kbd>hs_ed25519_public_key</kbd>, <kbd>hs_ed25519_secret_key</kbd>.
+> if <kbd>tor/service</kbd> is a directory it will copy the content inside that directory into /var/lib/tor/hidden_room inside tor image, it should contains <kbd>hostname</kbd>, <kbd>hs_ed25519_public_key</kbd>, <kbd>hs_ed25519_secret_key</kbd> files.
 >
-> and if <kbd>tor/service</kbd> is a file it will try to create custom onion address based on the text inside that file (keep in mind the longer the prefix the more time is required to build tor image, 4 or less characters would be fine). if there is no text inside that file it will use "xroom" as prefix
+> and if <kbd>tor/service</kbd> is a file it will try to create custom onion address based on the text inside that file (keep in mind the longer the prefix the more time is required to build tor image, 4 or less characters would be fine). if there is no text inside that file it will use "room" as prefix
 >
 >
 > if everything is ready, simply run

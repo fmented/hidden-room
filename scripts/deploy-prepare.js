@@ -226,8 +226,8 @@ HiddenServiceVersion 3
 
 
 const docker = `#!/bin/sh
-docker build -t hidden_room .
-docker run -d -t --rm -p ${__PROD_PORT__}:${__PROD_PORT__} --name hidden_room_container hidden_room
+docker build -t hidden_room_image .
+docker run -d --rm -p ${__PROD_PORT__}:${__PROD_PORT__} --name hidden_room hidden_room_image
 `
 const podman = docker.replace(/docker/g, 'podman')
 
@@ -281,14 +281,14 @@ RUN git clone https://github.com/cathugger/mkp224o.git
 
 WORKDIR /addr/mkp224o
 
+# Create custom onion address (it would take very long if the filter has 5 or more characters)
 RUN ./autogen.sh && ./configure && make
-RUN ./mkp224o ${filter == "" ?'xroom' : filter} -t 2 -v -n 1 -d ../res
+RUN ./mkp224o ${filter == "" ?'room' : filter} -t 2 -v -n 1 -d ../res
 
 WORKDIR /addr/res/
 
-RUN mv xroom* hidden_room
+RUN mv room* hidden_room
 RUN mkdir hidden_room/authorized_clients
-
 
 FROM alpine
 
@@ -304,7 +304,7 @@ RUN chmod +x /bin/start-services
 RUN chmod +x /bin/list-services
 RUN chmod +x /bin/stop-services
 
-COPY /addr/res/hidden_room /var/lib/tor/hidden_room
+COPY --from=0 /addr/res/hidden_room /var/lib/tor/hidden_room
 RUN chown -R tor /var/lib/tor/hidden_room
 RUN chmod -R u+rwX,og-rwx /var/lib/tor/hidden_room
 

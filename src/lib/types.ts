@@ -5,3 +5,11 @@ export type Msg = {
     alias: string
     time: number
 }
+
+export type FileConstructParam = {
+    buff: ArrayBuffer
+    name: string
+    type: string
+}
+
+export type MsgTransmit = Omit<Msg, "content"> & {content:FileConstructParam|string}

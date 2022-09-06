@@ -1,4 +1,6 @@
-export function calcTime(sent_date:number, now:number=new Date().getTime()) {
+import type { Msg } from "./types";
+
+export function calcTime(sent_date:number, now:number=timeNow()) {
     const x = now
     const ms = x - sent_date;
     if(ms > 3_600_000) return calcHours(ms, true);
@@ -6,6 +8,76 @@ export function calcTime(sent_date:number, now:number=new Date().getTime()) {
     else return calcSeconds(ms, true);
 }
 
+
+export function scroll() {
+    const h = document.querySelector('html')
+    h?.scroll({top:h.scrollHeight|0 + h.clientHeight, behavior:'smooth'})
+}
+
+export function createTitle(messages:Msg[], room:string){
+    if(messages.length){
+        const m = messages[messages.length-1]
+        return `${m.alias}: ${m.content instanceof File? parseType(m.content): m.content}`
+    }
+    return `Hidden Room ${room}` 
+}
+
+export function timeNow(){
+    return new Date().getTime()
+}
+
+function parseType(m:File){
+        const emj = m.type.startsWith('image')? '📷'
+                    : m.type.startsWith("audio")? "🎵"
+                    : m.type.startsWith("video")? "🎥"
+                    : '📁'
+        return `${emj} ${m.name}`
+    }
+
+
+export class Timer{
+    #anim: number|undefined
+    #lastTime:number|undefined
+    #cb:()=>void
+    #counter=0
+    #loop: (t:number)=>void
+
+    constructor(cb: ()=>void){
+        this.#cb = cb
+        this.#lastTime = undefined
+        this.#anim = undefined
+        this.#loop = (time:number)=>{
+            if (this.#lastTime === undefined) this.#lastTime = time
+            const delta = time - this.#lastTime
+            if(delta > (this.#counter < 5 ? 2_000 
+                : this.#counter < 11? 5_000
+                : this.#counter < 13? 10_000 : 60_000)
+                ){
+                this.#cb()
+                this.#counter += 1
+                this.#lastTime = time            
+            }
+            this.#anim = requestAnimationFrame(this.#loop)
+        }
+
+    }
+
+    start(){
+        this.#anim = requestAnimationFrame(this.#loop)
+    }
+
+    reset(){
+        this.stop()
+        this.start()
+    }
+
+    stop(){
+        if (!this.#anim) return
+        this.#lastTime = undefined
+        this.#counter = 0
+        cancelAnimationFrame(this.#anim)
+    }
+}
 
 function calcSeconds(ms:number):number
 function calcSeconds(ms:number, show:true):string

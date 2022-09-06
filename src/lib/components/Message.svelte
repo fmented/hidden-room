@@ -1,12 +1,14 @@
 <script lang="ts">
-    import { calcTime } from "$lib/utils";
+    import { calcTime, Timer } from "$lib/utils";
     import {browser} from '$app/environment'
     import {objURL} from '$lib/store'
+    import { onMount, onDestroy } from "svelte";
     export let sender = false;
     export let content:string|File = ''
     export let _from = ''
     export let time: number
 
+    let displayTime = calcTime(time)
 
     let url:string|undefined = ''
 
@@ -15,20 +17,22 @@
             url = $objURL.get(content)
         }
         else{
-            const r = new FileReader()
-            r.readAsDataURL(content)
-            r.addEventListener('load', _=>{
-                url = r.result as string
-                $objURL.set(content as File, url)
-            })
-
-            r.onerror = e=>{
-                console.log(e);     
-            }
+            url = URL.createObjectURL(content)
+            $objURL.set(content as File, url)
         }
     }
 
-    let t = calcTime(time)
+    let t: Timer
+
+    onMount(()=>{
+        t = new Timer(()=>displayTime=calcTime(time))
+        t.start()
+    })
+
+    onDestroy(()=>{
+        if(t) t.stop()
+    })
+    
 </script>
 
 <style>
@@ -88,6 +92,13 @@ a{
     color: inherit;
 }
 
+img, video, audio{
+    padding: .5rem;
+    max-width: 40vw;
+}
+
+
+
 </style>
 
 <div class="msg" class:accent={sender}>
@@ -96,17 +107,32 @@ a{
     </div>
     <em>
         <small>
-            {calcTime(time)}
+            {displayTime}
         </small>
     </em>
     {#if typeof content === 'string'}
         <p>{content}</p>
         {:else}
-        <p style="white-space: normal;">
-            Sent file:<br/>
-            <a href="{url}" download="{content.name}">
-            {content.name}
-            </a>
-        </p>
+        {#if content.type.startsWith('image')}
+            <img src="{url}" alt="{content.name}"/>
+        {:else if content.type.startsWith('audio')}
+            <audio controls>
+                <source src="{url}" type="{content.type}">
+                Your Browser Does't Support Audio Element
+            </audio>
+        {:else if content.type.startsWith('video')}
+            <video controls>
+                <track kind="captions"/>
+                <source src="{url}" type="{content.type}">
+                Your Browser Does't Support Video Element
+            </video>
+         {:else}
+            <p style="white-space: normal;">
+                Sent file:<br/>
+                <a href="{url}" download="{content.name}">
+                {content.name}
+                </a>
+            </p>
+        {/if}
     {/if}
 </div>

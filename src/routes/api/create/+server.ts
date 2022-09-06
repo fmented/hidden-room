@@ -1,4 +1,4 @@
-import {encrypt} from '$server/crypt'
+import {encrypt} from '$server/crypt.js'
 import type { RequestHandler } from '@sveltejs/kit'
 import {v4 as uuid} from 'uuid'
 
