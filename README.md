@@ -1,16 +1,7 @@
 
 [![Hidden Room](/static/Logo.svg?raw=true)](https://github.com/fmented/hidden-room)
 
-<style>
-    strong, h1, h2, summary{
-        color: #22aaff;
-        font-weight: bold;
-    }
 
-    strong, summary{
-        font-size: 18px;
-    }
-</style>
 # Hidden Room
 
 Web-based Anonymous Live Chat App.

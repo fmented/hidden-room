@@ -5,7 +5,7 @@ import type {ViteDevServer as vd} from 'vite'
 import type {Msg} from '$lib/types'
 
 export default function injectSocket(server: vd['httpServer']){
-    const io = new Server(server as s)
+    const io = new Server(server as s, {})
 
     io.on('connection', (socket)=>{
         const room = socket.handshake.query.room as string
@@ -14,6 +14,7 @@ export default function injectSocket(server: vd['httpServer']){
         const alias = socket.handshake.query.alias as string
         
         let match = false
+        
 
         try {
             match = decrypt(key as string) === room
@@ -23,22 +24,29 @@ export default function injectSocket(server: vd['httpServer']){
         }
 
         if(!key || !match || !room || !alias || !id) {
+            console.log(key, match, room, alias, id);
+            
             socket.emit('kick')
             socket.disconnect(true)
             return
         }
 
+        socket.on('test', ()=>{
+            socket.disconnect(true)
+        })
+
         socket.join(room)
 
         const msg:Omit<Msg, 'time'> = {
             from: id,
-            message: 'Joined room',
+            type: 'text',
+            content : 'Joined room',
             alias,
         }
 
         socket.broadcast.to(room).emit('join', msg)
         
-        socket.on('message', (msg)=>{
+        socket.on('message', async (msg:Msg)=>{       
             socket.broadcast.to(room).emit('message', msg)
 
         })

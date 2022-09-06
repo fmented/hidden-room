@@ -1,5 +1,5 @@
-export function calcTime(sent_date:number) {
-    const x = new Date().getTime();
+export function calcTime(sent_date:number, now:number=new Date().getTime()) {
+    const x = now
     const ms = x - sent_date;
     if(ms > 3_600_000) return calcHours(ms, true);
     else if(ms > 60_000) return calcMinutes(ms, true);

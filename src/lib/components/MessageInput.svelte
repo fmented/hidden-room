@@ -5,12 +5,29 @@
     let inputHeight = '4em'
     let processing= false
 
-    function send(){
+    function sendText(){
         if(message==='' || processing) return
         processing = true
-        d('send', message.trim())
+        d('send', {content:message.trim(), type:'text'})
         message = ''
         processing = false
+    }
+
+    let inputFile = false
+    let fileToSend: FileList|undefined = undefined 
+    let fileEl:HTMLInputElement 
+
+    function sendFile(){
+        if(fileToSend===undefined || processing) return
+        processing = true
+        d('send', {content:fileToSend[0], type:'file'})
+        fileToSend= undefined
+        fileEl.value = ''
+        processing = false
+    }
+
+    function send() {
+        return inputFile? sendFile() : sendText()
     }
 </script>
 
@@ -50,17 +67,32 @@ textarea{
     resize: none;
 }
 
+input[type="file"]{
+    flex-grow: 1;
+    min-height: 4em;
+    padding: .5em;
+    font-size: 12px;
+    background-color: var(--bg1);
+    color: var(--fg1);
+    align-self: center;
+}
 
 </style>
 
 <div class="input">
-    <label for="message" class="sr">Message</label>
-    <textarea id="message" placeholder="type your message here" style="min-height: {inputHeight};" bind:value="{message}" on:keypress={e=>{
-        const k = e.key.toLowerCase()
-        if( (k === 'enter' || k === 'return') && !e.getModifierState('Shift')) {
-            e.preventDefault()
-            send()
-        }
-    }}/>
+    <button on:click="{()=>inputFile=!inputFile}">{inputFile? "Text" : "File"}</button>
+    {#if !inputFile}
+        <label for="message" class="sr">Message</label>
+        <textarea id="message" placeholder="type your message here" style="min-height: {inputHeight};" bind:value="{message}" on:keypress={e=>{
+            const k = e.key.toLowerCase()
+            if( (k === 'enter' || k === 'return') && !e.getModifierState('Shift')) {
+                e.preventDefault()
+                send()
+            }
+        }}/>
+    {:else}
+        <label for="file" class="sr">File</label>
+        <input type="file" bind:files="{fileToSend}" bind:this="{fileEl}" style="height: {inputHeight};">
+    {/if}
     <button on:click="{send}">send</button>
 </div>

@@ -1,15 +1,6 @@
 import fs from 'fs';
-import { exit } from 'process';
 
-if(!fs.existsSync('dist/server/settings.js')){
-    console.error(`
-    Server hasn't been built yet
-    Run "npm run build:server" or "npm run build"
-    `);
-    exit(1)
-}
-
-import {__PROD_HOSTNAME__, __PROD_PORT__} from '../dist/server/settings.js'
+import {__PROD_HOSTNAME__, __PROD_PORT__} from '../server/settings.js'
 
 const web = `
 FROM node:18-alpine

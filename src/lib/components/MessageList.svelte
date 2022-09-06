@@ -24,10 +24,11 @@ section{
 </style>
 
 <section>
-    {#each messages as message (`${message.from}${message.message}${calcTime(message.time)}`)}
+    <!-- svelte-ignore missing-declaration -->
+    {#each messages as message, i (`${i}${message.from}${calcTime(message.time)}`)}
         <Message 
-            message={message.message} 
-            _from={message.alias} 
+            content={message.content}
+            _from={message.alias}
             sender={message.from===id} 
             time={message.time}/>
     {/each}

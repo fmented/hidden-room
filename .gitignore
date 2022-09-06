@@ -8,6 +8,6 @@ node_modules
 !.env.example
 .vercel
 .output
-server/key.ts
+server/key.js
 dist
 tor/service

@@ -1,11 +1,34 @@
 <script lang="ts">
     import { calcTime } from "$lib/utils";
+    import {browser} from '$app/environment'
+    import {objURL} from '$lib/store'
     export let sender = false;
-    export let message = ''
+    export let content:string|File = ''
     export let _from = ''
     export let time: number
 
-    $: t = calcTime(time)
+
+    let url:string|undefined = ''
+
+    $: if(browser && content instanceof File){
+        if($objURL.has(content)){
+            url = $objURL.get(content)
+        }
+        else{
+            const r = new FileReader()
+            r.readAsDataURL(content)
+            r.addEventListener('load', _=>{
+                url = r.result as string
+                $objURL.set(content as File, url)
+            })
+
+            r.onerror = e=>{
+                console.log(e);     
+            }
+        }
+    }
+
+    let t = calcTime(time)
 </script>
 
 <style>
@@ -53,12 +76,17 @@ p{
     margin: 0;
     font-size: 18px;
     font-weight: 900;
+    white-space: pre-wrap;
+    word-break: break-all;
 }
 
 em{
     align-self: flex-end;
 }
 
+a{
+    color: inherit;
+}
 
 </style>
 
@@ -66,6 +94,19 @@ em{
     <div class="head">
         <strong>{sender?'you':_from}</strong>
     </div>
-    <em><small>{t}</small></em>
-    <p>{message}</p>
+    <em>
+        <small>
+            {calcTime(time)}
+        </small>
+    </em>
+    {#if typeof content === 'string'}
+        <p>{content}</p>
+        {:else}
+        <p style="white-space: normal;">
+            Sent file:<br/>
+            <a href="{url}" download="{content.name}">
+            {content.name}
+            </a>
+        </p>
+    {/if}
 </div>

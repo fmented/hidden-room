@@ -13,7 +13,7 @@
 
     $room=$page.params.room
     let auth = false
-    let client:ReturnType<typeof io>| undefined = undefined
+    let client:ReturnType<typeof io>| undefined = undefined    
 
     function connect(key:string) {
         if(!key || !$userAlias || !$userId) return
@@ -24,7 +24,7 @@
                 id: $userId
             },
             extraHeaders: {key}
-        })
+        });
 
         client.on('connect', ()=>{
             if(client?.connected) auth=true
@@ -42,24 +42,36 @@
         })
 
         client.on('kick', ()=>{
-            client?.disconnect()
+            console.log('kicked');
+            
         })
 
-        client.on('disconnect', ()=>{
-            window.location.href = '/'
+        client.on('disconnect', reason =>{
+
+            if(reason==="transport close"){
+                client?.connect()
+            }
+            else if(reason==="io client disconnect" || 
+                    reason==="io server disconnect"){
+                         window.location.href= "/"
+            }     
+            else{
+                console.log(reason);   
+            }
         })
     }
 
     function scroll() {
         const h = document.querySelector('html')
-        h?.scroll({top:h.scrollHeight, behavior:'smooth'})
+        h?.scroll({top:h.scrollHeight+1000, behavior:'smooth'})
     }
 
 
-    function send(_msg:string) {
+    async function send(_msg:{type:string, content:string|File}) {
         if(!client) return
-        const m = {
-            message:_msg,
+        const m:Msg = {
+            type: _msg.type as Msg["type"],
+            content: _msg.content,
             from:$userId,
             alias:$userAlias,
             time: new Date().getTime()
@@ -70,7 +82,7 @@
     }
 
     let title = messages.length
-        ? `${messages[messages.length-1].alias} : ${messages[messages.length-1].message}`
+        ? `${messages[messages.length-1].alias} : ${messages[messages.length-1].type=="text" ? messages[messages.length-1].content: (messages[messages.length-1].content as {name:string}).name}`
         : `Hidden Room ${$room}` 
 
     let lastTime:number|undefined
@@ -123,6 +135,6 @@
         <JoinRoomModal on:join={e=>connect(e.detail)}/>
     </section>
     {:else}
-    <MessageList {messages} on:refresh={()=>messages=messages}/>
+    <MessageList {messages}/>
     <MessageInput on:send={(e)=>send(e.detail)}/>
 {/if}
