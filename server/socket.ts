@@ -41,7 +41,7 @@ export default function injectSocket(server: vd['httpServer']){
                 alias,
                 time: new Date().getTime()
             }  
-            io.to(room).emit('message', msg)
+            io.to(room).emit('join', msg)
         })
         
         socket.on('message', async (msg:MsgTransmit)=>{  

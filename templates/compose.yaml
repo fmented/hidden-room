@@ -1,0 +1,14 @@
+services:
+  tor:
+    build: tor
+    container_name: tor
+    networks:
+       - tor-bridge
+
+  hidden_room:
+    build: .
+    container_name: web
+    network_mode: service:tor
+
+networks:
+  tor-bridge:

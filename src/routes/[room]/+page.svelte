@@ -1,13 +1,12 @@
 <script lang="ts">
     import { page } from "$app/stores";
-    import {room, objURL} from '$lib/store'
+    import {room, objURL , userAlias, userId } from '$lib/store'
     import JoinRoomModal from "$lib/components/JoinRoomModal.svelte";
     import MessageInput from "$lib/components/MessageInput.svelte";
     import MessageList from "$lib/components/MessageList.svelte";
-    import { userAlias, userId } from "$lib/store";
     import {io} from "socket.io-client";
     import type { Msg, MsgTransmit, FileConstructParam } from "$lib/types";
-    import { createTitle, scroll, timeNow } from "$lib/utils";
+    import { createTitle, scroll } from "$lib/utils";
     import { onDestroy } from "svelte";
 
     let messages:Msg[] = []
@@ -55,6 +54,11 @@
             client=undefined
         })
 
+        client.on('join', (msg:Msg)=>{
+            if(msg.from===$userId) return
+            messages = [...messages, msg]
+        })
+
         client.on('disconnect', reason =>{
             if(reason==="transport close"){
                 client?.connect()
@@ -81,7 +85,7 @@
         client.emit('message', m)
     }
 
-    $: title = createTitle(messages, $room)
+    $: title = createTitle(messages, $room, $userId)
 
     onDestroy(()=>{
         $objURL.forEach(u=> URL.revokeObjectURL(u))

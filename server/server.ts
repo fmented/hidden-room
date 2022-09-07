@@ -8,7 +8,7 @@ const app = express();
 const server = http.createServer(app)
 
 const port = __PROD_PORT__||3000
-const hostname = __PROD_HOSTNAME__||'localhost'
+const hostname:string = __PROD_HOSTNAME__||'localhost'
 
 injectSocket(server)
 
@@ -16,6 +16,6 @@ function cb(){
     console.log(`\nServer is running at http://${hostname}:${port}`);
 }
 
-app.use(handler as any)
+app.use(handler)
 
-hostname? server.listen(port, cb) : server.listen(port, hostname as any, cb)
+server.listen(port, hostname, cb)

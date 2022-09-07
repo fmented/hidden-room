@@ -1,4 +1,7 @@
-import type { Msg } from "./types";
+import type { Msg, MsgTransmit, FileConstructParam } from "./types";
+import { io } from "socket.io-client";
+import type {Writable} from 'svelte/store' 
+import { writable, get } from "svelte/store";
 
 export function calcTime(sent_date:number, now:number=timeNow()) {
     const x = now
@@ -14,10 +17,10 @@ export function scroll() {
     h?.scroll({top:h.scrollHeight|0 + h.clientHeight, behavior:'smooth'})
 }
 
-export function createTitle(messages:Msg[], room:string){
+export function createTitle(messages:Msg[], room:string, id:string){
     if(messages.length){
         const m = messages[messages.length-1]
-        return `${m.alias}: ${m.content instanceof File? parseType(m.content): m.content}`
+        return `${m.from === id? 'You': m.alias}: ${m.content instanceof File? parseType(m.content): m.content}`
     }
     return `Hidden Room ${room}` 
 }
@@ -33,7 +36,6 @@ function parseType(m:File){
                     : '📁'
         return `${emj} ${m.name}`
     }
-
 
 export class Timer{
     #anim: number|undefined
@@ -77,6 +79,13 @@ export class Timer{
         this.#counter = 0
         cancelAnimationFrame(this.#anim)
     }
+}
+
+export function calcFileSizeLimit(n:number) {
+    if(n >= 1_000_000_000) return `${Math.round(n / 1_000_000_000)} GB`
+    if(n >= 1_000_000) return `${Math.round(n / 1_000_000)} MB`
+    if(n >= 1_000) return `${Math.round(n / 1_000)} KB`
+    return `${n} BYTES`
 }
 
 function calcSeconds(ms:number):number

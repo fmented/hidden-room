@@ -2,6 +2,7 @@
     import type {FileConstructParam} from "$lib/types" 
     import { createEventDispatcher } from "svelte";
     import {__TRANFER_LIMIT__} from "$server/settings"
+    import {calcFileSizeLimit} from "$lib/utils"
 
     let message = ''
     const d = createEventDispatcher()
@@ -36,7 +37,7 @@
         processing = false
     }
 
-    const maxSize = __TRANFER_LIMIT__.toLocaleString()
+    const maxSize = calcFileSizeLimit(__TRANFER_LIMIT__)
 
     
 
@@ -106,7 +107,7 @@ input[type="file"]{
 
 <div class="input">
     {#if inputFile}
-        <small class="file-size-warning">MAX FILE SIZE IS {maxSize} BYTES</small>
+        <small class="file-size-warning">MAX FILE SIZE IS {maxSize}</small>
     {/if}
     <button class="type-select" on:click="{()=>inputFile=!inputFile}">{inputFile? "Text" : "File"}</button>
     {#if !inputFile}
