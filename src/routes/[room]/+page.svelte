@@ -26,7 +26,8 @@
             extraHeaders: {key}
         });
 
-        client.on('connect', ()=>{
+        client.once('connect', ()=>{
+            client?.emit('join')
             if(client?.connected) auth=true
         })
 
@@ -37,29 +38,24 @@
                 const d = msg.content as FileConstructParam
                 content = new File([d.buff], d.name, {type: d.type})
             }
-
             else{
                 content = msg.content as string
             }
 
             const m = {...msg, content}    
-            messages = [...messages, {...m, time:new Date().getTime()}]
-            scroll()
-            
-        })
-
-        client.on('join', (msg:Msg)=>{
-            messages = [...messages, {...msg, time:new Date().getTime()}]
+            messages = [...messages, m]
             scroll()
         })
 
         client.on('kick', ()=>{
             messages = []
             client?.disconnect()
+            auth = false
+            $room = ''
+            client=undefined
         })
 
         client.on('disconnect', reason =>{
-
             if(reason==="transport close"){
                 client?.connect()
             }
@@ -76,27 +72,19 @@
 
     async function send(_msg:Pick<MsgTransmit, "content" | "type">) {
         if(!client) return
-        const m:MsgTransmit = {
+        const m:Omit<MsgTransmit, "time"> = {
             type: _msg.type as Msg["type"],
             content: _msg.content,
             from:$userId,
             alias:$userAlias,
-            time: timeNow()
         }
-
-        const selfmsg:Msg = typeof _msg.content === 'string'
-        ? {...m, content:_msg.content}
-        : {...m, content:new File([_msg.content.buff], _msg.content.name, {type: _msg.content.type})}
-
-        messages = [...messages, selfmsg]
-
-        scroll()
         client.emit('message', m)
     }
 
     $: title = createTitle(messages, $room)
 
     onDestroy(()=>{
+        $objURL.forEach(u=> URL.revokeObjectURL(u))
         $objURL.clear()
     })
 </script>

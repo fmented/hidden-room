@@ -4,7 +4,7 @@
 
 # Hidden Room
 
-Web-based Anonymous Live Chat App.
+Web-based anonymous live chat app and file sharing.
 
 ## Initial Setup
 
@@ -46,14 +46,14 @@ npm run build
 To run the server
 
 ```bash
-# run server 
+# run server without tor
 npm run serve
 ```
 
 ## Container
 
 ```bash
-# generate necessary files for deployment
+# generate necessary files for containerization
 npm run deploy:prepare
 
 ```
@@ -87,7 +87,7 @@ chmod +x podman.sh
 
 ## Deployment
 Hidden Room was meant to be a hidden service.
-For easy deployment it includes tor image builder that is located in tor directory 📁, it will also generate <kbd>docker-compose.yaml</kbd> so it can easily be deployed using <kbd>docker-compose</kbd> or <kbd>podman-compose</kbd>
+For easy deployment it includes tor image builder that is located in tor directory 📁, it will also generate <kbd>docker-compose.yaml</kbd> so it can easily be deployed using container orchestrator like <kbd>docker-compose</kbd> or <kbd>podman-compose</kbd>
 
 > when you run
 > ```bash
@@ -134,3 +134,15 @@ For easy deployment it includes tor image builder that is located in tor directo
 > check the address using Tor Browser and see if it's running
 >
 >___
+
+
+## TODO
+> **Server**
+>- [ ] http2 server
+
+> **Client**
+>- [ ] file type icons
+>- [ ] file signature-based file type detection
+
+> **Container**
+> - [ ] firewall for tor image

@@ -9,7 +9,7 @@
     --fg1: white;
     --fg2: #ddd;
 
-    --sf: 3;
+    --sf: 2;
 
     --pat: radial-gradient(circle at center center, var(--bg1), var(--ac1)), repeating-radial-gradient(circle at center center, var(--bg1), var(--bg1), 40px, transparent 80px, transparent 40px);
 }
@@ -72,14 +72,7 @@ section{
     animation-timing-function: ease-out;
 }  
 
-
-@media screen and (min-width: 400px) {
-    :root{
-        --sf: 2;
-    }
-}
-
-@media screen and (min-width: 600px) {
+@media screen and (min-width: 456px) {
     :root {	
       --sf: 1 
     

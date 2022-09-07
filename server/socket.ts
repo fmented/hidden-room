@@ -7,8 +7,6 @@ import { __TRANFER_LIMIT__ } from './settings.js';
 
 export default function injectSocket(server: vd['httpServer']){
     const io = new Server(server as s, {
-        pingInterval:25_000, 
-        pingTimeout:200_000,
         maxHttpBufferSize: __TRANFER_LIMIT__
     })
 
@@ -20,40 +18,34 @@ export default function injectSocket(server: vd['httpServer']){
         
         let match = false
         
-
         try {
-            match = decrypt(key as string) === room
+            match = decrypt(key) === room
             
         } catch (error) {
             if((error as {library:string}).library !== "Provider routines") console.log(error);
         }
 
         if(!key || !match || !room || !alias || !id) {
-            console.log(key, match, room, alias, id);
-            
+            console.log(key, match, room, alias, id);     
             socket.emit('kick')
             socket.disconnect(true)
             return
         }
 
-        socket.on('test', ()=>{
-            socket.disconnect(true)
+        socket.on('join', ()=>{
+            socket.join(room)
+            const msg:Msg = {
+                from: id,
+                type: 'text',
+                content : 'Joined room',
+                alias,
+                time: new Date().getTime()
+            }  
+            io.to(room).emit('message', msg)
         })
-
-        socket.join(room)
-
-        const msg:Omit<Msg, 'time'> = {
-            from: id,
-            type: 'text',
-            content : 'Joined room',
-            alias,
-        }
-
-        socket.broadcast.to(room).emit('join', msg)
         
-        socket.on('message', async (msg:MsgTransmit)=>{       
-            socket.broadcast.to(room).emit('message', msg)
-
+        socket.on('message', async (msg:MsgTransmit)=>{  
+            io.to(room).emit('message', {...msg, time: new Date().getTime()})
         })
 
     })

@@ -1,6 +1,7 @@
 <script lang="ts">
     import type {FileConstructParam} from "$lib/types" 
     import { createEventDispatcher } from "svelte";
+    import {__TRANFER_LIMIT__} from "$server/settings"
 
     let message = ''
     const d = createEventDispatcher()
@@ -34,6 +35,10 @@
         fileEl.value = ''
         processing = false
     }
+
+    const maxSize = __TRANFER_LIMIT__.toLocaleString()
+
+    
 
     function send() {
         return inputFile? sendFile() : sendText()
@@ -84,12 +89,26 @@ input[type="file"]{
     background-color: var(--bg1);
     color: var(--fg1);
     align-self: center;
+    border-radius: .5em;
+}
+
+.file-size-warning{
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: var(--fg1);
+    font-weight: bold;
+    width: 100%;
+    text-align: center;
 }
 
 </style>
 
 <div class="input">
-    <button on:click="{()=>inputFile=!inputFile}">{inputFile? "Text" : "File"}</button>
+    {#if inputFile}
+        <small class="file-size-warning">MAX FILE SIZE IS {maxSize} BYTES</small>
+    {/if}
+    <button class="type-select" on:click="{()=>inputFile=!inputFile}">{inputFile? "Text" : "File"}</button>
     {#if !inputFile}
         <label for="message" class="sr">Message</label>
         <textarea id="message" placeholder="type your message here" style="min-height: {inputHeight};" bind:value="{message}" on:keypress={e=>{

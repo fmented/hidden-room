@@ -52,14 +52,13 @@
 		top: 0;
 		position: absolute;
 		text-align: center;
-		left: 50%;
-		transform: translateX(-50%);
+		left: 0;
+		width: 100%;
 		overflow: hidden;
 		color: white;
 		font-weight: bold;
 		z-index: 1;
 		font-family: Arial, Helvetica, sans-serif;
-
 	}	
 	
 </style>
